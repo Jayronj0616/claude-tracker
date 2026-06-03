@@ -94,6 +94,7 @@ export default function DashboardPage() {
                 account={acc}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onRefresh={fetchAccounts}
               />
             ))}
           </div>
