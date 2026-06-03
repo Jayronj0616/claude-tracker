@@ -26,11 +26,16 @@ export default function AccountCard({ account, onEdit, onDelete }: Props) {
   const [status, setStatus] = useState(() => getStatus(account.next_available_at))
 
   useEffect(() => {
+    setStatus(getStatus(account.next_available_at))
     const interval = setInterval(() => {
       setStatus(getStatus(account.next_available_at))
-    }, 30000)
+    }, 10000)
     return () => clearInterval(interval)
   }, [account.next_available_at])
+
+  const tasks = account.task
+    ? account.task.split('\n').map(t => t.trim()).filter(Boolean)
+    : []
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col gap-3">
@@ -60,8 +65,15 @@ export default function AccountCard({ account, onEdit, onDelete }: Props) {
         </p>
       )}
 
-      {account.task ? (
-        <p className="text-gray-300 text-sm bg-gray-800 rounded-lg px-3 py-2">{account.task}</p>
+      {tasks.length > 0 ? (
+        <ul className="bg-gray-800 rounded-lg px-3 py-2 flex flex-col gap-1">
+          {tasks.map((t, i) => (
+            <li key={i} className="text-gray-300 text-sm flex gap-2">
+              <span className="text-gray-500 mt-0.5">•</span>
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
       ) : (
         <p className="text-gray-600 text-sm italic">No task set</p>
       )}
