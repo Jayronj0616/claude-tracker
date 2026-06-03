@@ -7,6 +7,20 @@ import { Account } from '@/lib/types'
 import AccountCard from '@/components/AccountCard'
 import AccountModal from '@/components/AccountModal'
 
+function sortAccounts(accounts: Account[]): Account[] {
+  return [...accounts].sort((a, b) => {
+    const now = Date.now()
+    const aAvail = !a.next_available_at || new Date(a.next_available_at).getTime() <= now
+    const bAvail = !b.next_available_at || new Date(b.next_available_at).getTime() <= now
+    if (aAvail && !bAvail) return -1
+    if (!aAvail && bAvail) return 1
+    if (!aAvail && !bAvail) {
+      return new Date(a.next_available_at!).getTime() - new Date(b.next_available_at!).getTime()
+    }
+    return 0
+  })
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -27,7 +41,7 @@ export default function DashboardPage() {
       .from('accounts')
       .select('*')
       .order('created_at', { ascending: true })
-    setAccounts(data || [])
+    setAccounts(sortAccounts(data || []))
     setLoading(false)
   }
 
@@ -62,20 +76,22 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 p-6">
+    <div className="min-h-screen p-6" style={{ backgroundColor: '#F5F0E8' }}>
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-white text-2xl font-bold">Claude Tracker</h1>
+          <h1 className="text-2xl font-semibold" style={{ color: '#2D2520' }}>Claude Tracker</h1>
           <div className="flex gap-3">
             <button
               onClick={handleAdd}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+              className="px-4 py-2 rounded-lg text-sm font-medium transition"
+              style={{ backgroundColor: '#C0622F', color: '#FFFEF9' }}
             >
               + Add Account
             </button>
             <button
               onClick={handleLogout}
-              className="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded-lg text-sm transition"
+              className="px-4 py-2 rounded-lg text-sm transition"
+              style={{ backgroundColor: '#E8E0D0', color: '#8C7B6B' }}
             >
               Logout
             </button>
@@ -83,9 +99,9 @@ export default function DashboardPage() {
         </div>
 
         {loading ? (
-          <p className="text-gray-500 text-center mt-20">Loading...</p>
+          <p className="text-center mt-20" style={{ color: '#8C7B6B' }}>Loading...</p>
         ) : accounts.length === 0 ? (
-          <p className="text-gray-500 text-center mt-20">No accounts yet. Add one to get started.</p>
+          <p className="text-center mt-20" style={{ color: '#8C7B6B' }}>No accounts yet. Add one to get started.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {accounts.map((acc) => (
